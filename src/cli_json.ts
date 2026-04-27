@@ -26,18 +26,9 @@ function main() {
   }
 
   const files = parseDiff(input);
-  // Intelligence toggle via CLI flags: --intelligent / --no-intelligent
-  let intelligent = true;
-  if (process.argv.includes('--no-intelligent')) intelligent = false;
-  if (process.argv.includes('--intelligent')) intelligent = true;
-  const commit = generateCommitFromDiff(files, { includeBody: true, style: 'conventional', intelligent });
-
-  // Output
-  console.log(commit.subject);
-  if (commit.body && commit.body.length > 0) {
-    console.log('');
-    console.log(commit.body.filter(line => line.length > 0).join('\n'));
-  }
+  const commit = generateCommitFromDiff(files, { includeBody: true, style: 'conventional', intelligent: true });
+  const payload = { subject: commit.subject, body: commit.body, scope: commit.scope };
+  console.log(JSON.stringify(payload, null, 2));
 }
 
 if (require.main === module) {

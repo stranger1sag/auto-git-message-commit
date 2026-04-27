@@ -1,0 +1,16 @@
+diff --git a/src/foo.js b/src/bar.js
+similarity index 0
+rename from src/foo.js
+rename to src/bar.js
+--- a/src/foo.js
++++ b/src/bar.js
+@@ -1,5 +1,6 @@
+-function oldThing() { return 1; }
+function newThing() { return 2; }
+
+rename from src/a.js
+rename to src/b.js
+--- a/src/a.js
++++ b/src/b.js
+@@ -1,3 +1,3 @@
+const a = 3;

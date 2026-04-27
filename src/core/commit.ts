@@ -47,11 +47,14 @@ export function generateCommitFromDiff(
       const extra = [] as string[];
       if (typeof f.added === 'number' && f.added > 0) extra.push(`added ${f.added} lines`);
       if (typeof f.removed === 'number' && f.removed > 0) extra.push(`removed ${f.removed} lines`);
-      if (f.notes && f.notes.length) extra.push(`notes: ${f.notes.join(', ')}`);
-      // Intelligent mode: if enabled, include an aggregated intelligence summary
-      if (options?.intelligent && f.notes && f.notes.length) {
-        const summary = f.notes.map(n => n.toString()).join('; ');
-        extra.push(`intelligence: ${summary}`);
+      if (f.notes && f.notes.length) {
+        const uniqNotes = Array.from(new Set(f.notes.map(n => n.toString().trim()))).join('; ');
+        extra.push(`notes: ${uniqNotes}`);
+        // Intelligent mode: add a summary if it provides additional context beyond notes
+        if (options?.intelligent) {
+          const summary = Array.from(new Set(f.notes.map(n => n.toString().trim()))).join('; ');
+          if (summary && summary !== uniqNotes) extra.push(`intelligence: ${summary}`);
+        }
       }
       if (extra.length) body.push(`  - ${extra.join(', ')}`);
     }

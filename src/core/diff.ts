@@ -44,9 +44,49 @@ export function parseDiff(text: string): DiffFile[] {
   let current: Partial<DiffFile> | null = null;
   let added = 0;
   let removed = 0;
+  // Quick system-reminder extractor: capture notes inside <system-reminder> blocks
+  // This helps users annotate diffs with executable reminders that we can surface as notes.
+  let systemNotesBuffer: string[] = [];
+  let inSystemReminder = false;
   // Note collection per file
 
   for (const line of lines) {
+    // Lightweight handling for HTML-like system-reminder blocks embedded in diffs
+    if (line.includes('<system-reminder>')) {
+      const openIdx = line.indexOf('<system-reminder>') + '<system-reminder>'.length;
+      const endIdx = line.indexOf('</system-reminder>');
+      if (endIdx > -1) {
+        const content = line.substring(openIdx, endIdx).trim();
+        if (current && content) {
+          if (!current.notes) current.notes = [];
+          current.notes.push(content);
+        }
+        inSystemReminder = false;
+      } else {
+        const content = line.substring(openIdx).trim();
+        systemNotesBuffer.push(content);
+        inSystemReminder = true;
+      }
+      // skip further processing of this line for diff parsing
+      continue;
+    }
+    if (inSystemReminder) {
+      // Accumulate until we hit the closing tag
+      const endIdx = line.indexOf('</system-reminder>');
+      if (endIdx > -1) {
+        const content = line.substring(0, endIdx).trim();
+        systemNotesBuffer.push(content);
+        if (current) {
+          if (!current.notes) current.notes = [];
+          if (systemNotesBuffer.length) current.notes.push(...systemNotesBuffer);
+        }
+        systemNotesBuffer = [];
+        inSystemReminder = false;
+      } else {
+        systemNotesBuffer.push(line.trim());
+      }
+      continue;
+    }
     if (line.startsWith('diff --git ')) {
       // push previous file if any
       if (current && current.path) {
