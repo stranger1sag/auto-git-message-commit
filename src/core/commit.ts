@@ -47,6 +47,7 @@ export function generateCommitFromDiff(
       const extra = [] as string[];
       if (typeof f.added === 'number' && f.added > 0) extra.push(`added ${f.added} lines`);
       if (typeof f.removed === 'number' && f.removed > 0) extra.push(`removed ${f.removed} lines`);
+      if (f.notes && f.notes.length) extra.push(`notes: ${f.notes.join(', ')}`);
       if (extra.length) body.push(`  - ${extra.join(', ')}`);
     }
   }
