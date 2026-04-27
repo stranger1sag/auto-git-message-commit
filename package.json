@@ -1,0 +1,22 @@
+{
+  "name": "commit-diff2msg",
+  "version": "0.1.0",
+  "description": "Generate git commit messages from diff text (MVP: rule-based, extensible)",
+  "main": "dist/cli.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "commit-diff2msg": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "test": "echo \"No tests yet.\" && exit 0"
+  },
+  "keywords": ["git", "commit", "diff", "commit-message"],
+  "author": "OpenCode",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^18.15.11"
+  }
+}
