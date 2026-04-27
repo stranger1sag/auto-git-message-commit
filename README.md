@@ -1,5 +1,6 @@
 # commit-diff2msg
 
+current this tool is not useful and it's made with AI.
 A minimal MVP to generate git commit messages from diff text using a rule-based approach with extensibility for LLM and external APIs.
 
 ## Quick Start
