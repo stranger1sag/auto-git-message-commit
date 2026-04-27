@@ -86,6 +86,9 @@ export function parseDiff(text: string): DiffFile[] {
         added++;
         const ent = extractEntityFromLine(line);
         if (ent && current.notes) current.notes.push(ent);
+        // Intelligence: extract additional notes from added lines
+        const intel = extractIntelligentNotesFromLine(line);
+        if (intel.length && current.notes) current.notes.push(...intel);
       }
     } else if (line.startsWith('-') && !line.startsWith('---')) {
       if (current) removed++;
@@ -99,4 +102,27 @@ export function parseDiff(text: string): DiffFile[] {
   }
 
   return files;
+}
+
+// Intelligent note extractor: tries to surface semantic hints from an added line
+function extractIntelligentNotesFromLine(line: string): string[] {
+  const notes: string[] = [];
+  const raw = line.replace(/^[+]/, '').trim();
+  if (!raw) return notes;
+  const lower = raw.toLowerCase();
+  // Simple keyword-driven heuristics
+  const keywords = [
+    'function','class','interface','api','endpoint','route','test','tests','describe','it','mock','docs','readme','markdown','config','lint','eslint','prettier','db','database','migration','schema','update','add','remove','rename','refactor'
+  ];
+  for (const kw of keywords) {
+    if (lower.includes(kw)) {
+      notes.push(raw);
+      break;
+    }
+  }
+  // Capture a potential identifier function/class name if present
+  const m = raw.match(/([A-Za-z_$][\w$]*)\s*\(/);
+  if (m && m[1]) notes.push(m[1]);
+  // Deduplicate and return
+  return Array.from(new Set(notes.map(n => n.trim()).filter(Boolean)));
 }

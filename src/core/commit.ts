@@ -20,7 +20,7 @@ function describeChange(f: DiffFile): string {
 
 export function generateCommitFromDiff(
   files: DiffFile[],
-  options?: { includeBody?: boolean; style?: 'conventional' | 'custom' }
+  options?: { includeBody?: boolean; style?: 'conventional' | 'custom'; intelligent?: boolean }
 ): CommitCandidate {
   const includeBody = options?.includeBody ?? true;
   const hasAddOrModify = files.some(f => f.changeType === 'A' || f.changeType === 'M');
@@ -48,6 +48,11 @@ export function generateCommitFromDiff(
       if (typeof f.added === 'number' && f.added > 0) extra.push(`added ${f.added} lines`);
       if (typeof f.removed === 'number' && f.removed > 0) extra.push(`removed ${f.removed} lines`);
       if (f.notes && f.notes.length) extra.push(`notes: ${f.notes.join(', ')}`);
+      // Intelligent mode: if enabled, include an aggregated intelligence summary
+      if (options?.intelligent && f.notes && f.notes.length) {
+        const summary = f.notes.map(n => n.toString()).join('; ');
+        extra.push(`intelligence: ${summary}`);
+      }
       if (extra.length) body.push(`  - ${extra.join(', ')}`);
     }
   }
