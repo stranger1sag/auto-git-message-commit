@@ -1,6 +1,7 @@
 // ============================================================
-// CommitGen - Generate git commit messages from diff
+// Core Module - Re-export all core functionality
 // ============================================================
 
-export * from './core';
-export * from './lib';
+export * from './types';
+export * from './parser';
+export * from './builder';
